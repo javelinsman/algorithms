@@ -11,7 +11,7 @@ typedef pair<int, int> pii;
  * Dijkstra Algorithm
  * - compute the minimum distance from "ini" to "fin"
  * - the graph is implemented as vvi type
- * - though the number of iteration of major loop can be small as V, the critical part is inserting to pq, which should occur at least E times. 
+ * - though the major while loop can iterate as small times as V, the critical part is inserting to pq, which should occur at least E times 
  * - time complexity : O(ElogV)
  */
 int dijkstra(vvi& graph, int ini, int fin){
