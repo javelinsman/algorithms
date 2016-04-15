@@ -54,4 +54,8 @@ struct SegmentTree{
         }
         return ans;
     }
+
+    T ref(int ind){
+        return tree[ind + offset];
+    }
 };
