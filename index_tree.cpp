@@ -2,23 +2,34 @@
 #include <vector>
 using namespace std;
 
+/*
+ * Segment Tree
+ * supports point-wise update and range query
+ *
+ * Usage
+ *
+ * SegmentTree<T> st(size, default value, op);
+ *      - size is the number of elements, 0 to size-1
+ *      - op is the operator which satisfies associative property
+ *      - default value is the identity elemend of op
+ *      - ex. SegmentTree<int> st(100, 1, [](int a, int b){return a * b;});
+ * st.push(int i, T t);
+ * st.query(int i, int j);
+ */
 
+template <typename T>
 struct SegmentTree{
-    typedef long long ll;
-    typedef vector<ll> vl;
+    vector<T> tree;
+    int offset;
+    T defval;
+    T (*op)(T a, T b);
 
-    vl tree;
-    ll offset;
-    ll defval;
-    ll (*op)(ll a, ll b);
-
-    SegmentTree(ll _size, ll _defval, ll (*_op)(ll a, ll b)): op(_op), defval(_defval) {
+    SegmentTree(T _size, T _defval, T (*_op)(T a, T b)): op(_op), defval(_defval) {
         for(offset = 1;offset < _size;offset *= 2);
-        printf("offset = %lld\n", offset);
-        tree = vl(offset * 2, _defval);
+        tree = vector<T>(offset * 2, _defval);
     }
 
-    void push(ll ind, ll val){
+    void push(int ind, T val){
         ind += offset;
         tree[ind] = val;
         while(ind > 0){
@@ -27,8 +38,8 @@ struct SegmentTree{
         }
     }
 
-    ll query(ll ini, ll fin){
-        ll ans = defval;
+    T query(int ini, int fin){
+        T ans = defval;
         ini += offset;
         fin += offset;
         while(ini <= fin){
@@ -44,19 +55,3 @@ struct SegmentTree{
         return ans;
     }
 };
-
-typedef long long ll;
-
-int main(){
-    SegmentTree mytree(10, 0, [](ll a, ll b){return a + b;});
-    for(int i=0;i<10;i++){
-        mytree.push(i, i);
-    }
-    int n; scanf("%d", &n);
-    while(n--){
-        int a, b, c; scanf("%d%d%d", &a, &b, &c);
-        if(a == 1) mytree.push(b, c);
-        else printf("%lld\n", mytree.query(b, c));
-    }
-    return 0;
-}
