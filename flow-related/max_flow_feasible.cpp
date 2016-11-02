@@ -63,7 +63,7 @@ struct MaxFlow{
 
 struct MaxFlowFeasible{
     typedef MaxFlow::flow_t flow_t;
-    struct edge{ int next, lo, hi, x, y; };
+    struct edge{ int next; flow_t lo, hi; int x, y; };
     int n; vector<vector<edge>> g;
     MaxFlow mf1, mf2; flow_t circulation;
     MaxFlowFeasible(int _n) : n(_n) { g.resize(n); mf1.init(n+2); mf2.init(n); }
@@ -71,7 +71,13 @@ struct MaxFlowFeasible{
         g[u].push_back({v, lo, hi, -1, -1});
         return (int)g[u].size() - 1;
     }
+    /* remove or optimize this function to enhance performance */
+    bool has_invalid_edge(){
+        for(int i=0;i<n;i++) for(auto& e : g[i]) if(e.lo > e.hi) return true;
+        return false;
+    }
     bool feasible_flow(int src, int dst){
+        if(has_invalid_edge()) return false;
         vector<flow_t> inflow(n, 0);
         for(int i=0;i<n;i++) for(auto& e : g[i]){
             e.x = mf1.add_edge(i, e.next, e.hi - e.lo);
@@ -91,7 +97,7 @@ struct MaxFlowFeasible{
         circulation = mf1.g[dst][circ_ind].orig - mf1.g[dst][circ_ind].cap;
         return ret;
     }
-    flow_t solve_max(int src, int dst){
+    flow_t maximum_flow(int src, int dst){
         for(int i=0;i<n;i++) for(auto& e : g[i]){
             flow_t f = e.lo + mf1.g[i][e.x].orig - mf1.g[i][e.x].cap;
             e.y = mf2.add_edge(i, e.next, e.hi - f, f - e.lo);
@@ -108,22 +114,19 @@ struct MaxFlowFeasible{
 int main(){
     int n, m; scanf("%d%d", &n, &m);
     MaxFlowFeasible mff(n);
-    vector<pair<int,int>> ind;
+    vector<pair<int,int>> edge_ind(m);
     for(int i=0;i<m;i++){
         int u, v, l, r; scanf("%d%d%d%d", &u, &v, &l, &r);
-        ind.emplace_back(u, mff.add_edge(u, v, l, r));
+        edge_ind[i] = {u, mff.add_edge(u, v, l, r)};
     }
     int s, t; scanf("%d%d", &s, &t);
-    if(mff.feasible_flow(s,t)){
-        printf("Feasible flow exists with its maximum flow = %d\n", mff.solve_max(s,t));
-        for(auto ij : ind){
+    if(mff.feasible_flow(s, t)){
+        printf("%d\n", mff.maximum_flow(s, t));
+        for(auto ij : edge_ind){
             auto& e = mff.g[ij.first][ij.second];
-            printf("%d->%d (%d..%d) currently flowing %d\n", ij.first, e.next, e.lo, e.hi,
-                    mff.arc_flow(ij.first, ij.second));
+            printf("edge %d -> %d with capacity (%d...%d) is sending flow %d\n",
+                    ij.first, e.next, e.lo, e.hi, mff.arc_flow(ij.first, ij.second));
         }
     }
-    else{
-        printf("Feasible flow doesn't exist\n");
-    }
-    return 0;
+    else printf("-1\n");
 }
