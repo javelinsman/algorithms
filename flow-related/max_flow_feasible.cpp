@@ -5,6 +5,12 @@
 #include <memory.h>
 using namespace std;
 
+/*
+ * Feasible Maximum Flow (Flow with lower bounds)
+ * O(V^2 E)
+ * verification : http://codeforces.com/contest/704/problem/D
+ */
+
 struct MaxFlow{
     typedef int flow_t;
     struct edge{int next, inv; flow_t cap, orig;};
