@@ -109,7 +109,7 @@ struct MaxFlowFeasible{
         }
         return circulation + mf2.solve(src, dst);
     }
-    int arc_flow(int u, int ind){
+    flow_t arc_flow(int u, int ind){
         auto& e = g[u][ind];
         return e.lo + (mf1.g[u][e.x].orig - mf1.g[u][e.x].cap)
             + (mf2.g[u][e.y].orig - mf2.g[u][e.y].cap);
